@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Отправка координат</title>
+</head>
+<body>
+  <h2>Определение координат и RSSI</h2>
+  <p id="status">Ожидание координат...</p>
+  <button onclick="sendLocation()">Отправить</button>
+
+  <script>
+    function sendLocation() {
+      if (!navigator.geolocation) {
+        document.getElementById("status").innerText = "Геолокация не поддерживается";
+        return;
+      }
+
+      navigator.geolocation.getCurrentPosition(function(position) {
+        const lat = position.coords.latitude.toFixed(6);
+        const lon = position.coords.longitude.toFixed(6);
+        const rssi = Math.floor(Math.random() * 20 - 80); // Эмуляция RSSI (-60...-80)
+
+        const url = `http://192.168.4.1/update?lat=${lat}&lon=${lon}&rssi=${rssi}`;
+        fetch(url)
+          .then(response => response.text())
+          .then(data => {
+            document.getElementById("status").innerText = "Координаты отправлены!";
+          })
+          .catch(err => {
+            document.getElementById("status").innerText = "Ошибка отправки.";
+            console.error(err);
+          });
+      }, function(error) {
+        document.getElementById("status").innerText = "Ошибка геолокации: " + error.message;
+      });
+    }
+  </script>
+</body>
+</html>
